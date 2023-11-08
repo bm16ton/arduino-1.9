@@ -675,6 +675,26 @@
     <copy todir="linux/work" file="linux/dist/arduino-linux-setup.sh" />
     <copy todir="linux/work" file="linux/dist/uninstall.sh" />
 
+    <copy todir="linux/work/hardware" >
+    <fileset dir="linux/dist" includes="teensy/**" />
+    </copy>
+    
+    <copy todir="linux/work/hardware/tools" >
+    <fileset dir="linux/dist/tools" includes="arm/**" />
+    </copy>
+    
+    <copy todir="linux/work/hardware/tools" >
+    <fileset dir="linux/dist/tools2" includes="**" />
+    </copy>
+    
+    <chmod perm="+x">
+      <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**/arm/bin/*"/>
+      <fileset dir="${staging_folder}/work/${staging_hardware_folder}/tools" includes="**"/>
+    </chmod>
+    
+    <mkdir dir="${staging_folder}/work/portable" />
+    <copy todir="${staging_folder}/work/portable" file="linux/work/lib/preferences.txt" />
+    
     <chmod perm="ugo+x">
         <fileset dir="linux/work" includes="arduino" />
         <fileset dir="linux/work" includes="**/*.sh" />

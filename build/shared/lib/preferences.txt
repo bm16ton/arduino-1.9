@@ -276,6 +276,7 @@ serial.stopbits=1
 serial.parity=N
 serial.debug_rate=9600
 serial.line_ending=1
+serial.unbuffered=1
 
 # I18 Preferences
 
