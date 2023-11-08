@@ -1,0 +1,10 @@
+--- app/src/processing/app/AbstractTextMonitor.java
++++ app/src/processing/app/AbstractTextMonitor.java
+@@ -51,6 +53,7 @@ public abstract class AbstractTextMonitor extends AbstractMonitor {
+   protected JCheckBox addTimeStampBox;
+   protected JComboBox<String> lineEndings;
+   protected JComboBox<String> serialRates;
++  protected JComboBox<String> serialPorts;
+ 
+   public AbstractTextMonitor(BoardPort boardPort) {
+     super(boardPort);

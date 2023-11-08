@@ -1,0 +1,28 @@
+--- app/src/processing/app/Editor.java
++++ app/src/processing/app/Editor.java
+@@ -326,23 +327,10 @@ public void windowDeactivated(WindowEvent e) {
+     lineStatus = new EditorLineStatus();
+     consolePanel.add(lineStatus, BorderLayout.SOUTH);
+ 
++    codePanel = new JPanel(new BorderLayout());
++    upper.add(codePanel);
+ 
+-
+-    project = new EditorProject("/home/sami/Arduino", base, this);
+-    middle.add(project);
+-    codePanel = new JPanel(new BorderLayout());
+-    editor_upper.add(codePanel);
+-    middle.add(editor_upper);
+-
+-    JSplitPane splitProject = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, project, editor_upper);
+-    splitProject.setBackground(new Color(23, 161, 165));
+-    splitProject.setContinuousLayout(true);
+-    splitProject.setResizeWeight(0.25);
+-    splitProject.setBackground(Color.BLACK);
+-    middle.add(splitProject);
+-    upper.add(middle);
+     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upper, consolePanel);
+-    SwingUtilities.invokeLater(project);
+ 
+     // repaint child panes while resizing
+     splitPane.setContinuousLayout(true);
