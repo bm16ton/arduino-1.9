@@ -765,7 +765,7 @@ private void deleteTempFile(File tempFile) {
     });
     sketchMenu.add(item);
     
-//[980f] add menu item to reload folder after adding files outside of the IDE:
+//[980f] add menu to delete4 build cache
     item= new JMenuItem(tr("Clean build cache"));
     item.addActionListener(event->{
 //      request.setBuildCachePath(null);
