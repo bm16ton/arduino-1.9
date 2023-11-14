@@ -25,13 +25,7 @@ package processing.app;
 import static processing.app.I18n.tr;
 import static processing.app.Theme.scale;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
@@ -131,6 +125,8 @@ public class Editor extends JFrame implements RunnerListener {
   private JMenu recentSketchesMenu;
   private JMenu programmersMenu;
   private final Box upper;
+  private final Box middle; // Contains the header, project and editor
+  private final Box editor_upper;
   private ArrayList<EditorTab> tabs = new ArrayList<>();
   private int currentTabIndex = -1;
   private static boolean watcherDisable = false;
@@ -211,6 +207,7 @@ public class Editor extends JFrame implements RunnerListener {
   final EditorHeader header;
   EditorStatus status;
   EditorConsole console;
+  EditorProject project;
 
   private JSplitPane splitPane;
 
@@ -319,6 +316,8 @@ public class Editor extends JFrame implements RunnerListener {
 
     Box box = Box.createVerticalBox();
     upper = Box.createVerticalBox();
+    middle = Box.createHorizontalBox();
+    editor_upper = Box.createVerticalBox();
 
     if (toolbarMenu == null) {
       toolbarMenu = new JMenu();
@@ -328,7 +327,7 @@ public class Editor extends JFrame implements RunnerListener {
     upper.add(toolbar);
 
     header = new EditorHeader(this);
-    upper.add(header);
+    editor_upper.add(header);
 
     // assemble console panel, consisting of status area and the console itself
     JPanel consolePanel = new JPanel();
@@ -346,10 +345,23 @@ public class Editor extends JFrame implements RunnerListener {
     lineStatus = new EditorLineStatus();
     consolePanel.add(lineStatus, BorderLayout.SOUTH);
 
-    codePanel = new JPanel(new BorderLayout());
-    upper.add(codePanel);
 
+
+    project = new EditorProject("/home/sami/Arduino", base, this);
+    middle.add(project);
+    codePanel = new JPanel(new BorderLayout());
+    editor_upper.add(codePanel);
+    middle.add(editor_upper);
+
+    JSplitPane splitProject = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, project, editor_upper);
+    splitProject.setBackground(new Color(23, 161, 165));
+    splitProject.setContinuousLayout(true);
+    splitProject.setResizeWeight(0.25);
+    splitProject.setBackground(Color.BLACK);
+    middle.add(splitProject);
+    upper.add(middle);
     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upper, consolePanel);
+    SwingUtilities.invokeLater(project);
 
 
     // repaint child panes while resizing
@@ -753,7 +765,7 @@ private void deleteTempFile(File tempFile) {
 //[980f] add menu item to reload folder after adding files outside of the IDE:
     item= new JMenuItem(tr("Refresh Sketch"));
     item.addActionListener(event->{
-      Base base = Base.forhacking;
+//      Base base = Base.forhacking;
       Editor activeEditor = base.getActiveEditor();
       try {
         if (activeEditor.getSketch().reload()) {
