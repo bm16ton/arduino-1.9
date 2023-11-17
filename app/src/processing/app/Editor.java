@@ -25,7 +25,13 @@ package processing.app;
 import static processing.app.I18n.tr;
 import static processing.app.Theme.scale;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
@@ -210,6 +216,7 @@ public class Editor extends JFrame implements RunnerListener {
   EditorProject project;
 
   private JSplitPane splitPane;
+  private JSplitPane splitProject;
 
   // currently opened program
   SketchController sketchController;
@@ -345,23 +352,12 @@ public class Editor extends JFrame implements RunnerListener {
     lineStatus = new EditorLineStatus();
     consolePanel.add(lineStatus, BorderLayout.SOUTH);
 
-
-
-    project = new EditorProject("/home/sami/Arduino", base, this);
-    middle.add(project);
     codePanel = new JPanel(new BorderLayout());
     editor_upper.add(codePanel);
     middle.add(editor_upper);
 
-    JSplitPane splitProject = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, project, editor_upper);
-    splitProject.setBackground(new Color(23, 161, 165));
-    splitProject.setContinuousLayout(true);
-    splitProject.setResizeWeight(0.25);
-    splitProject.setBackground(Color.BLACK);
-    middle.add(splitProject);
     upper.add(middle);
     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, upper, consolePanel);
-    SwingUtilities.invokeLater(project);
 
 
     // repaint child panes while resizing
@@ -414,6 +410,11 @@ public class Editor extends JFrame implements RunnerListener {
 
     // default the console output to the last opened editor
     EditorConsole.setCurrentEditorConsole(console);
+
+    // Add Project View if True in the saved preferences
+
+    if(PreferencesData.getBoolean("project.view"))
+      handleAddProjectView();
   }
 
   public Base getBase() {
@@ -811,6 +812,15 @@ private void deleteTempFile(File tempFile) {
 
     item = newJMenuItemShift(tr("Serial Plotter"), 'L');
     item.addActionListener(e -> handlePlotter());
+    toolsMenu.add(item);
+
+    item = newJMenuItemShift(tr("Project View"), 'J');
+    item.addActionListener(e -> {
+      if (!PreferencesData.getBoolean("project.view")) {
+        handleAddProjectView();
+      }else{
+        handleRemoveProjectView();}
+    });
     toolsMenu.add(item);
 
     addTools(toolsMenu, BaseNoGui.getToolsFolder());
@@ -2747,6 +2757,55 @@ private void deleteTempFile(File tempFile) {
 
   public void addCompilerProgressListener(CompilerProgressListener listener){
     this.status.addCompilerProgressListener(listener);
+  }
+
+  public void handleAddProjectView(){
+
+
+    // Check if the recent sketch is saved, if not fall back on the sketchbook path
+    if(untitled){
+      project = new EditorProject(PreferencesData.get("sketchbook.path"), base, this);
+    }else{
+      project = new EditorProject(sketch.getFolder().getAbsolutePath(), base, this);
+    }
+
+    // Reset the panels and add the project view
+    middle.remove(editor_upper);
+
+    middle.add(project);
+    middle.add(editor_upper);
+
+    // Split the code and project View
+    splitProject = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, project, editor_upper);
+    splitProject.setContinuousLayout(true);
+    splitProject.setResizeWeight(0.10f);
+    middle.add(splitProject);
+
+    // Pack the frame
+    pack();
+
+    // Print the status
+    statusNotice(tr("Added Project View"));
+
+    // Update preferences
+    PreferencesData.setBoolean("project.view", true);
+  }
+
+  public void handleRemoveProjectView(){
+    // Reset the panels and add only the code view
+    middle.remove(project);
+    middle.remove(editor_upper);
+    middle.remove(splitProject);
+    middle.add(editor_upper);
+
+    // Pack the frame
+    pack();
+
+    // Print the status
+    statusNotice(tr("Removed Project View"));
+
+    // Update preferences
+    PreferencesData.setBoolean("project.view", false);
   }
 
 }

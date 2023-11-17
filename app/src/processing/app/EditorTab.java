@@ -117,7 +117,6 @@ public class EditorTab extends JPanel implements SketchFile.TextStorage {
    * @param editor
    *          The Editor this tab runs in
    * @param file
-    }
    *          The file to display in this tab
    * @param contents
    *          Initial contents to display in this tab. Can be used when editing

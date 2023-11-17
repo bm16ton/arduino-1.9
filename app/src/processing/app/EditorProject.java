@@ -1,21 +1,16 @@
 package processing.app;
 
+import processing.app.tools.NavigateDialog;
+import processing.app.tools.ProjectExplorer;
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
+import static processing.app.I18n.tr;
 
-public class EditorProject extends JScrollPane implements Runnable, MouseListener {
 
-  private DefaultMutableTreeNode root;
+public class EditorProject extends JPanel {
 
-  private DefaultTreeModel treeModel;
-
-  private JTree tree;
+  private ProjectExplorer fileExplorerPanel;
 
   private File fileRoot;
 
@@ -23,123 +18,47 @@ public class EditorProject extends JScrollPane implements Runnable, MouseListene
 
   private Editor editor;
 
-  private String workspace = System.getProperty("user.home") + "/";
+  private String path;
+
+  private JFileChooser chooser;
+
+  private ProjectToolbar projectToolbar;
+
+  private NavigateDialog navigateDialog;
+
+  boolean navigating;
+
 
   public EditorProject(String path, Base base, Editor editor){
+    this.setLayout(new BorderLayout());
     fileRoot = new File(path);
     this.base = base;
     this.editor = editor;
-    this.setPreferredSize(new Dimension(400, 1000));
+    fileExplorerPanel = new ProjectExplorer(fileRoot, editor);
+    projectToolbar = new ProjectToolbar(editor, this);
+    this.add(projectToolbar, BorderLayout.NORTH);
+    this.add(fileExplorerPanel);
+
   }
 
-  @Override
-  public void run() {
-    root = new DefaultMutableTreeNode(new FileNode(fileRoot));
-    treeModel = new DefaultTreeModel(root);
+  public void resetProject(File file){
+    // Resetting the project View and root directory
+    fileRoot = file;
+    path = file.getPath();
+    fileExplorerPanel.replaceWorkingDirectory(fileRoot);
 
-
-    tree = new JTree(treeModel);
-    tree.setShowsRootHandles(true);
-    tree.addMouseListener(this);
-    setViewportView(tree);
-
-
-    CreateChildNodes ccn =
-      new CreateChildNodes(fileRoot, root);
-    new Thread(ccn).start();
+    editor.statusNotice(tr("Navigated to :")+path);
   }
 
-  @Override
-  public void mouseClicked(MouseEvent e) {
-    int selRow = tree.getRowForLocation(e.getX(), e.getY());
-    TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-    if(selRow != -1) {
-      if(e.getClickCount() == 2) {
-        String path = selPath.toString().replaceAll("\\]| |\\[|", "").replaceAll(",", File.separator);
-        try {
-          editor.getSketchController().addFile(new File(workspace + path));
 
-        } catch (Exception exception) {
-          exception.printStackTrace();
-        }
-      }
+  public void handleNavigate(){
+    if(!navigating) {
+      navigateDialog = new NavigateDialog(new File(System.getProperty("user.home")), fileRoot, this);
+      navigating = true;
+    }else{
+      navigateDialog.getDialog().toFront();
     }
   }
 
-  @Override
-  public void mousePressed(MouseEvent e) {
-
-  }
-
-  @Override
-  public void mouseReleased(MouseEvent e) {
-
-  }
-
-  @Override
-  public void mouseEntered(MouseEvent e) {
-
-  }
-
-  @Override
-  public void mouseExited(MouseEvent e) {
-
-  }
-
-  public class CreateChildNodes implements Runnable {
-
-    private DefaultMutableTreeNode root;
-
-    private File fileRoot;
-
-    public CreateChildNodes(File fileRoot,
-                            DefaultMutableTreeNode root) {
-      this.fileRoot = fileRoot;
-      this.root = root;
-    }
-
-    @Override
-    public void run() {
-      createChildren(fileRoot, root);
-    }
-
-    private void createChildren(File fileRoot,
-                                DefaultMutableTreeNode node) {
-      File[] files = fileRoot.listFiles();
-      if (files == null) return;
-
-      for (File file : files) {
-        DefaultMutableTreeNode childNode =
-          new DefaultMutableTreeNode(new FileNode(file));
-        node.add(childNode);
-        if (file.isDirectory()) {
-          createChildren(file, childNode);
-        }
-      }
-    }
-
-  }
-
-  public class FileNode {
-
-    private File file;
-
-    public FileNode(File file) {
-      this.file = file;
-    }
-
-    @Override
-    public String toString() {
-      String name = file.getName();
-      if (name.equals("")) {
-        return file.getAbsolutePath();
-      } else {
-        return name;
-      }
-    }
-  }
 
 }
-
-
-
