@@ -413,8 +413,8 @@ public class Editor extends JFrame implements RunnerListener {
 
     // Add Project View if True in the saved preferences
 
-    if(PreferencesData.getBoolean("project.view"))
-      handleAddProjectView();
+//    if(PreferencesData.getBoolean("project.view"))
+//      handleAddProjectView();
   }
 
   public Base getBase() {
@@ -2788,7 +2788,7 @@ private void deleteTempFile(File tempFile) {
     statusNotice(tr("Added Project View"));
 
     // Update preferences
-    PreferencesData.setBoolean("project.view", true);
+//    PreferencesData.setBoolean("project.view", true);
   }
 
   public void handleRemoveProjectView(){
