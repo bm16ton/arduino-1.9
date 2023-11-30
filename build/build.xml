@@ -679,6 +679,10 @@
     <fileset dir="linux/dist" includes="teensy/**" />
     </copy>
     
+    <copy todir="linux/work/hardware" >
+    <fileset dir="linux/dist" includes="Rogers_STM32/**" />
+    </copy>
+    
     <copy todir="linux/work/hardware/tools" >
     <fileset dir="linux/dist/tools" includes="arm/**" />
     </copy>
@@ -694,6 +698,11 @@
     
     <mkdir dir="${staging_folder}/work/portable" />
     <copy todir="${staging_folder}/work/portable" file="linux/work/lib/preferences.txt" />
+    <mkdir dir="${staging_folder}/work/portable/sketchbook" />
+    <mkdir dir="${staging_folder}/work/portable/sketchbook/theme" />
+    <copy todir="${staging_folder}/work/portable/sketchbook/theme">
+    <fileset dir="theme" includes="*.zip" />
+    </copy>
     
     <chmod perm="ugo+x">
         <fileset dir="linux/work" includes="arduino" />
